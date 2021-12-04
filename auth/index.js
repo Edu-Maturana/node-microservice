@@ -1,45 +1,45 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const error = require('../utils/error');
 
 const secret = config.jwt.secret;
 
 function sign(data) {
-    return jwt.sign(data, secret)
+    return jwt.sign(data, secret);
 }
 
 function verify(token) {
-    return jwt.verify(token, secret);
+    return jwt.verify(token, secret)
 }
 
 const check = {
     own: function(req, owner) {
         const decoded = decodeHeader(req);
         console.log(decoded);
+
         if (decoded.id !== owner) {
-            throw new Error('You don\'t have permission to do that');
+            throw error('No puedes hacer esto', 401);
         }
     },
 }
 
-function getToken(authorization) {
-    // Bearer token
-    if (!authorization) {
-        throw new Error('No token provided');
+function getToken(auth) {
+    if (!auth) {
+        throw error('No viene token', 401);
     }
 
-    if (authorization.indexOf('Bearer') === -1) {
-        throw new Error('Invalid token');
+    if (auth.indexOf('Bearer ') === -1) {
+        throw error('Formato invalido', 401);
     }
 
-    let token = authorization.replace('Bearer ', ''); 
-
+    let token = auth.replace('Bearer ', '');
     return token;
 }
 
 function decodeHeader(req) {
     const authorization = req.headers.authorization || '';
     const token = getToken(authorization);
-    decoded = verify(token);
+    const decoded = verify(token);
 
     req.user = decoded;
 
@@ -49,4 +49,4 @@ function decodeHeader(req) {
 module.exports = {
     sign,
     check,
-}
+};

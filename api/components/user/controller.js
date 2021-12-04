@@ -32,7 +32,7 @@ module.exports = function (injectedStore) {
         if (body.password || body.username) {
             await auth.upsert({
                 id: user.id,
-                username: body.username,
+                username: user.username,
                 password: body.password,
             })
         }
